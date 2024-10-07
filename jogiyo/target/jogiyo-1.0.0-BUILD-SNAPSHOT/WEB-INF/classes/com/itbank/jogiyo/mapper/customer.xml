@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="customer">
+ 	<select id="cMypageList" parameterType="string" resultType="LoginDTO">
+ 		 SELECT id, passwd, name, mail, phone FROM jaccount WHERE id = #{id}
+ 	</select>
+ 	
+ 	<update id="updateCustomer" parameterType="LoginDTO">
+    	update jaccount set passwd = #{passwd}, mail = #{mail}, phone = #{phone}, name = #{name} where id =#{id}
+	</update>
+ 	
+	<delete id="secessionCustomer" parameterType="String">
+		 delete from jaccount where id= #{id}
+	</delete>
+	
+	<select id ="pastOrderList" parameterType="String" resultType="OrderDTO">
+		SELECT A.id, TO_CHAR(A.indate, 'YYYY-MM-DD') AS indate, A.totprice, B.storename, j.MENUNAME 
+		FROM jorder A
+		JOIN jstore B ON A.storeid = B.storeid
+		JOIN JMENU j ON a.MENUID  = j.MENUID 
+		WHERE A.id = #{id}
+	</select>
+	
+	<select id ="customerCoupon" parameterType="String" resultType="CouponDTO">
+		select * from jcoupon A join jusercoupon U on A.couponid = U.couponid where U.id=#{id}
+	</select>
+	
+	<select id="viewStore" parameterType="int" resultType="storeDTO">
+		select * from jstore where storeid = #{storeid}
+	</select>
+	<!-- 이재홍 작성 -->
+	<select id="viewStoreInfo" resultType="viewstoreDTO" parameterType="int">
+		SELECT jm.MENUID, jm.storeid, jm.jscateid, 
+       jm.menuname, jm.menucontent, jm.img, jm.price, js.JSTORENAME,
+       (SELECT COUNT(*) FROM jmenu WHERE STOREID = jm.STOREID AND JSCATEID = jm.JSCATEID) AS CNT
+		FROM jmenu jm
+		JOIN JSTORECATE js ON jm.STOREID = js.STOREID AND jm.JSCATEID = js.JSCATEID AND jm.STOREID = #{storeid}
+		ORDER BY jscateid, menuid
+	</select>
+	<select id="storeList" parameterType="String" resultType="StoreDTO">
+         select * from jstore 
+   </select>
+   
+   <select id="cateList" parameterType="String" resultType="StoreDTO">
+         select * from jcate
+   </select>
+<select id="cateStoreList" parameterType="String" resultType="storeDTO">
+         SELECT storeid, storename, js.cateid, 
+   STORECONTENT, ID, js.IMG, COUPONID, 
+   ADDRESS, DETAILADDRESS, 
+   EXTRAADDRESS, POSTCODE, jc.CATENAME  
+   FROM jstore js, jcate jc WHERE js.CATEID = jc.CATEID AND js.cateID = #{cateid}
+   </select>
+   <select id="basketList" resultType="MenuDTO" parameterType="list">
+        SELECT * FROM jmenu WHERE menuid IN
+        <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    
+    <select id="basket" parameterType="String" resultType="BasketDTO">
+    	select * from jbasket join jmenu on jbasket.menuid = jmenu.menuid where id =#{id}
+    </select>
+    
+    <insert id="join_membership_ok" parameterType="loginDTO">
+      insert into jaccount values(#{id}, #{passwd}, #{name}, #{mail}, #{phone},
+            CASE WHEN #{grade} = 'ROLE_2' THEN 1 ELSE 0 END,
+            CASE WHEN #{grade} = 'ROLE_3' THEN 1 ELSE 0 END)
+   </insert>
+    
+ </mapper>

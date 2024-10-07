@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="store">
+ 	<select id="listStore" resultType="storeDTO">
+ 		select * from jstore
+ 	</select>
+ 	
+ 	<insert id="addStore" parameterType="storeDTO">
+		insert into jstore values(jstore_seq.nextval,#{storename},#{cateid},#{storecontent},
+		#{id},#{img},#{couponid},#{address},#{detailaddress},#{extraaddress},#{postcode},#{run})
+	</insert>
+	
+	<select id="getStore" parameterType="string" resultType="storeDTO">
+	select * from jstore where id = #{id}  <!--내 가게리스트 보기 -->
+	</select>
+	
+	<select id="getOwner" parameterType="string" resultType="LoginDTO">
+	select *from jaccount where id = #{id}
+	</select>
+	
+	<update id="editOwner" parameterType="LoginDTO">
+	update jaccount set passwd=#{passwd}, name=#{name}, mail=#{mail}, phone=#{phone}, grade=#{grade} where id=#{id}	
+	</update>
+	
+	<delete id="deleteOwner" parameterType="string">
+	delete from jaccount where id = #{id}
+	</delete>
+	
+	<select id ="findStore" parameterType="string" resultType="storeDTO">
+	select * from jstore where storename= #{storename}
+	</select>
+	
+	<update id="updateStore" parameterType="storeDTO">
+	update jstore set storename=#{storename},cateid=#{cateid},storecontent=#{storecontent},img= #{img},postcode=#{postcode},address=#{address},detailaddress=#{detailaddress},extraaddress=#{extraaddress} where storeid=#{storeid} 
+	</update>
+	
+	<delete id="deleteStore" parameterType="string">
+	delete from jstore where storename=#{storename}
+	</delete>
+	
+	<select id="findcateid" parameterType="int" resultType="int">
+	select jscateid from jstorecate where storeid=#{storeid}
+	</select>
+	
+	<insert id="addMenu" parameterType="menuDTO">
+	insert into jmenu values(jmenu_seq.nextval,#{storeid},#{jscateid},#{menuname},#{menucontent},#{img},#{price},#{mqty})
+	</insert>
+	
+	<select id="listMenu" parameterType="int" resultType="menuDTO"> 
+			SELECT *
+ 				from jmenu j1
+ 				JOIN jstorecate j2
+ 			on j1.jscateid = j2.jscateid
+ 			where j1.storeid=#{storeid}
+	</select>
+	
+	<delete id="deleteMenu" parameterType="int" >
+	delete from jmenu where menuid=#{menuid}
+	</delete>
+	
+	<select id ="getMenu" parameterType="int" resultType="menuDTO">
+			SELECT *
+ 				from jmenu j1
+ 			JOIN jstorecate j2
+ 				on j1.jscateid = j2.jscateid
+ 			where j1.menuid=#{menuid}
+	</select>
+	
+	<update id="editMenu" parameterType="menuDTO">
+	update jmenu 
+	<set>
+	<if test ="menuname!=null"> menuname=#{menuname}, </if>
+	<if test ="menucontent!=null">menucontent=#{menucontent},</if> 
+	<if test ="img!=null"> img=#{img},</if>
+	<if test ="price!=null"> price=#{price} </if>
+	</set>
+	where menuid=#{menuid}
+	</update>
+	<insert id="addCate" parameterType="java.util.Map">
+	insert into jstorecate values(jstorecate_seq.nextval,#{storeid},#{jstorename})
+	</insert>
+	
+	<select id="getCateList" resultType="jstorecateDTO" parameterType="int">
+		select jstorename,jscateid from jstorecate where storeid=#{storeid}
+	</select>
+	<update id="stopMenu"  parameterType="int">
+	update jmenu set mqty=0 where menuid=#{menuid}
+	</update>
+	<update id="startMenu"  parameterType="int">
+	update jmenu set mqty=1 where menuid=#{menuid}
+	</update>
+	<select id="getAllCate" resultType="categoryDTO">
+		select * from jcate
+	</select>
+	
+ </mapper>
